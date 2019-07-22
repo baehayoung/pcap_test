@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
     if (res == 0) continue;
     if (res == -1 || res == -2) break;
 
-    printf("Ethernet\n");
+    printf("------------------Ethernet------------------\n");
     const struct myEthernet *myEtehr = reinterpret_cast<const struct myEthernet*>(packet);
     printf("dMac: ");
     for(int i=0; i<6; i++){
@@ -38,15 +38,15 @@ int main(int argc, char* argv[]) {
     for(int i=0; i<6; i++){
         printf("%02X%c",myEtehr->sMac[i],(i==5)?'\n':':');
     }
-    if(((myEtehr->etherType<<8)|(myEtehr->etherType>>8)) == 0x0800){printf("\nIPv4\n");}
+    if(((myEtehr->etherType<<8)|(myEtehr->etherType>>8)) != 0x0800){continue;}
 
-
+    printf("\n----------------------IPv4----------------------\n");
     //packet+=14;
     const struct myIP *myIp = reinterpret_cast<const struct myIP*>(myEtehr->data);//packet);
     printf("sIP: %s\n",inet_ntoa(myIp->ip_src));
     printf("dIP: %s\n",inet_ntoa(myIp->ip_dst));
 
-    if((myIp->ip_p)==0x06) {printf("\nTCP\n"); //packet +=20;
+    if((myIp->ip_p)==0x06) {printf("\n-------------------TCP--------------------\n"); //packet +=20;
         const struct myTcphdr *myTcp = reinterpret_cast<const struct myTcphdr*>(myIp->data);//packet);
         printf("sPort: %d\n",ntohs(myTcp->tcp_sPort));
         printf("dPort: %d\n",ntohs(myTcp->tcp_dPort));
